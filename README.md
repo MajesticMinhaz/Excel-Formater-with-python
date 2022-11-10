@@ -9,7 +9,7 @@ This Python program can help you to change the original clues to new clues.
 Install all required packages with pip
 
 ```bash
-  python -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
     
 ## Environment Variables
@@ -25,25 +25,34 @@ To run this project, you will need to add the following environment variables to
 Clone the project
 
 ```bash
-  git clone https://github.com/mdminhaz2003/Excel-Formater-with-python.git
+git clone https://github.com/mdminhaz2003/Excel-Formater-with-python.git
 ```
 
 Go to the project directory
 
 ```bash
-  cd Excel-Formater-with-python
+cd Excel-Formater-with-python
+```
+
+Creating Virtual Environment
+```bash
+python -m venv ./venv
+```
+
+Activate the virtual environment
+```base
+venv\Scripts\activate
 ```
 
 Install dependencies
 
 ```bash
-  python -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-Start the program
-
+Create executable file for OS
 ```bash
-  python main.py
+pyinstaller clue_creator.py --onefile --windowed
 ```
 
 

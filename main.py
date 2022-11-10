@@ -1,16 +1,12 @@
 import os
 from re import sub
-from dotenv import dotenv_values
 from openpyxl import load_workbook
 import pandas as pd
 
+get_all_files = os.listdir("xlsx")
 
-config = dotenv_values(dotenv_path="./config.env")
-
-get_all_files = os.listdir(config.get('FILE_PATH'))
-
-file_paths = [os.path.join(config.get("FILE_PATH"), file_name) for file_name in get_all_files]
-output_paths = [os.path.join(config.get("OUTPUT_PATH"), file) for file in get_all_files]
+file_paths = [os.path.join("xlsx", file_name) for file_name in get_all_files]
+output_paths = [os.path.join("output", file) for file in get_all_files]
 
 for file_path, output_path in zip(file_paths, output_paths):
     all_values = list()

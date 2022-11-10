@@ -17,6 +17,7 @@ Install all required packages with pip
 To run this project, you will need to add the following environment variables to your config.env file
 
 `FILE_PATH`
+`OUTPUT_PATH`
 
 
 ## Run Locally

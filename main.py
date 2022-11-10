@@ -2,6 +2,7 @@ import os
 from re import sub
 from dotenv import dotenv_values
 from openpyxl import load_workbook
+import pandas as pd
 
 
 config = dotenv_values(dotenv_path="./config.env")
@@ -9,21 +10,20 @@ config = dotenv_values(dotenv_path="./config.env")
 get_all_files = os.listdir(config.get('FILE_PATH'))
 
 file_paths = [os.path.join(config.get("FILE_PATH"), file_name) for file_name in get_all_files]
+output_paths = [os.path.join(config.get("OUTPUT_PATH"), file) for file in get_all_files]
 
-for file_path in file_paths:
+for file_path, output_path in zip(file_paths, output_paths):
+    all_values = list()
     workbook = load_workbook(
         filename=file_path
     )
 
     worksheet = workbook['Sheet1']
-    second_worksheet = workbook.create_sheet("result")
-
-    second_worksheet['A1'] = "original"
-    second_worksheet['B1'] = "new"
 
     all_rows = worksheet.iter_rows(values_only=True)
 
     first_row = next(all_rows)
+    all_values.append(list(first_row))
 
     values = dict()
 
@@ -32,6 +32,7 @@ for file_path in file_paths:
 
         while is_word_table:
             word_row = next(all_rows)
+            all_values.append(list(word_row))
             length_of_row = len(word_row)
 
             if word_row.count(None).__eq__(length_of_row):
@@ -44,16 +45,14 @@ for file_path in file_paths:
                 else:
                     print("something went wrong")
 
-        for row, (original, new) in enumerate(values.items(), start=2):
-            second_worksheet[f"A{row}"] = original
-            second_worksheet[f"B{row}"] = new
-        second_worksheet.append([''])
     else:
         raise SyntaxError("original and new is not found in first row.")
 
-    original_clues_rows = next(all_rows)
-    if 'original clues' in original_clues_rows:
-        second_worksheet.append(["original clues", "new clues"])
+    clues_rows = next(all_rows)
+    all_values.append(list(clues_rows))
+    if 'original clues' in clues_rows and "new clues" in clues_rows:
+        new_clues_index = clues_rows.index("new clues")
+
         for clues in all_rows:
             cut_serial_number = sub(
                 pattern=r"^[\d.]+",
@@ -69,9 +68,14 @@ for file_path in file_paths:
                 else:
                     pass
 
-            second_worksheet.append([cut_serial_number, new_clues])
+            values_data = list(clues)
+            values_data[new_clues_index] = new_clues
+            all_values.append(values_data)
 
     else:
-        raise SyntaxError("original clues is not found after the word table")
+        raise SyntaxError("original clues or new clues is not found after the word table")
 
     workbook.save(file_path)
+
+    df = pd.DataFrame(data=all_values)
+    df.to_excel(output_path, index=False, header=False)

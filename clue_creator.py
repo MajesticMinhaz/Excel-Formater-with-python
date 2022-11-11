@@ -1,14 +1,12 @@
-import os
+import glob
 from re import sub
 from openpyxl import load_workbook
 import pandas as pd
 
-get_all_files = os.listdir("xlsx")
 
-file_paths = [os.path.join("xlsx", file_name) for file_name in get_all_files]
-output_paths = [os.path.join("output", file) for file in get_all_files]
-
-for file_path, output_path in zip(file_paths, output_paths):
+file_paths = glob.glob("*.xlsx")
+print(file_paths)
+for file_path in file_paths:
     all_values = list()
     workbook = load_workbook(
         filename=file_path
@@ -37,7 +35,7 @@ for file_path, output_path in zip(file_paths, output_paths):
                 if word_row.count(None).__eq__(1):
                     none_index = word_row.index(None)
                     for index in range(none_index):
-                        values[str(word_row[index])] = str(word_row[none_index + index + 1])
+                        values[str(word_row[index]).strip()] = str(word_row[none_index + index + 1]).strip()
                 else:
                     print("something went wrong")
 
@@ -56,16 +54,16 @@ for file_path, output_path in zip(file_paths, output_paths):
                 string=clues[0]
             ).strip()
 
-            new_clues = cut_serial_number
+            new_clues = cut_serial_number.casefold()
 
             for key, value in zip(values.keys(), values.values()):
-                if key in new_clues:
-                    new_clues = new_clues.replace(key, value)
+                if key.casefold() in new_clues:
+                    new_clues = new_clues.replace(key.casefold(), value)
                 else:
                     pass
 
             values_data = list(clues)
-            values_data[new_clues_index] = new_clues
+            values_data[new_clues_index] = new_clues.capitalize()
             all_values.append(values_data)
 
     else:
@@ -74,4 +72,4 @@ for file_path, output_path in zip(file_paths, output_paths):
     workbook.save(file_path)
 
     df = pd.DataFrame(data=all_values)
-    df.to_excel(output_path, index=False, header=False)
+    df.to_excel(file_path, index=False, header=False)
